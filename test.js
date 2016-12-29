@@ -39,13 +39,13 @@ var test = function(cnt, use_addon, use_minimaladdon) {
 
 var serialize = function(logindata) {
     var bufs = [];
-    bufs.push(addon.SerializePlayerData(logindata.player));
+    bufs.push(addon.SerializePlayerData(logindata.player.id, logindata.player.name, logindata.player.exp));
     var num_items = logindata.items.length;
     const buf = Buffer.allocUnsafe(4);
     buf.writeInt32LE(num_items);
     bufs.push(buf);
     for (var ii=0; ii<num_items; ii++) {
-        bufs.push(addon.SerializePlayerData(logindata.items[ii]));
+        bufs.push(addon.SerializeItemData(logindata.items[ii].id, logindata.items[ii].itemid, logindata.items[ii].num));
     }
     return Buffer.concat(bufs);
 };

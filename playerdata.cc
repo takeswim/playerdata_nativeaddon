@@ -66,7 +66,7 @@ namespace demo {
     item.itemid = info[1]->Uint32Value();
     item.num    = info[2]->Uint32Value();
 
-    info.GetReturnValue().Set(Nan::CopyBuffer((char*)&info, sizeof(info)).ToLocalChecked());
+    info.GetReturnValue().Set(Nan::CopyBuffer((char*)&item, sizeof(item)).ToLocalChecked());
   }
 
   // FIXME: 時間足りないので対応しない
