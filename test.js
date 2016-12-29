@@ -1,6 +1,6 @@
 var addon = require('./build/Release/addon');
 
-var test = function(cnt, use_addon) {
+var test = function(cnt, use_addon, use_minimaladdon) {
 
     // ログインデータサンプル
     var logindata = {
@@ -20,27 +20,52 @@ var test = function(cnt, use_addon) {
 
     // [計測] 1000回実行して経過時間を測定
     console.time('loop');
-    for(var ii = 0; ii < 1000; ii++) {
-	if (use_addon) {
-	    s = addon.Serialize(logindata);
-	} else {
+    if (use_addon === "minimal") {
+        for(var ii = 0; ii < 1000; ii++) {
+            serialize(logindata);
+        }
+    } else if (use_addon === "full") {
+        for(var ii = 0; ii < 1000; ii++) {
+            addon.Serialize(logindata);
+        }
+    } else {
+        for(var ii = 0; ii < 1000; ii++) {
 	    JSON.stringify(logindata);
-	}
+        }
     }
     console.timeEnd('loop');
 
 };
 
+var serialize = function(logindata) {
+    var bufs = [];
+    bufs.push(addon.SerializePlayerData(logindata.player));
+    var num_items = logindata.items.length;
+    const buf = Buffer.allocUnsafe(4);
+    buf.writeInt32LE(num_items);
+    bufs.push(buf);
+    for (var ii=0; ii<num_items; ii++) {
+        bufs.push(addon.SerializePlayerData(logindata.items[ii]));
+    }
+    return Buffer.concat(bufs);
+};
+
+
 var sample = [100,200,300,400,500,600,700,800,900,1000];
 
 console.log("##USE JSON.stringify##");
 for (var ii=0; ii< sample.length; ii++) {
-    test(sample[ii], false);
+    test(sample[ii]);
 }
 
 console.log("##USE Native Addon##");
 for (var ii=0; ii< sample.length; ii++) {
-    test(sample[ii], true);
+    test(sample[ii], "full");
+}
+
+console.log("##USE minimal Native Addon##");
+for (var ii=0; ii< sample.length; ii++) {
+    test(sample[ii], "minimal");
 }
 
 // EOF

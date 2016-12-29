@@ -47,6 +47,28 @@ namespace demo {
     delete[] buf;
   }
 
+  NAN_METHOD(SerializePlayerData)
+  {
+    PLAYERDATA playerdata;
+    // playerの各値をセット
+    info[0]->ToString()->WriteOneByte((uint8_t*)playerdata.id);
+    info[1]->ToString()->WriteUtf8(playerdata.name);
+    playerdata.exp = info[2]->Uint32Value();
+
+    info.GetReturnValue().Set(Nan::CopyBuffer((char*)&playerdata, sizeof(playerdata)).ToLocalChecked());
+  }
+
+  NAN_METHOD(SerializeItemData)
+  {
+    ITEMDATA item;
+    // itemの各値をセット
+    info[0]->ToString()->WriteOneByte((uint8_t*)item.id);
+    item.itemid = info[1]->Uint32Value();
+    item.num    = info[2]->Uint32Value();
+
+    info.GetReturnValue().Set(Nan::CopyBuffer((char*)&info, sizeof(info)).ToLocalChecked());
+  }
+
   // FIXME: 時間足りないので対応しない
   NAN_METHOD(Deserialize)
   {
@@ -58,6 +80,8 @@ namespace demo {
   NAN_MODULE_INIT(Init)
   {
     NAN_EXPORT(target, Serialize);
+    NAN_EXPORT(target, SerializePlayerData);
+    NAN_EXPORT(target, SerializeItemData);
     NAN_EXPORT(target, Deserialize);
   }
 
